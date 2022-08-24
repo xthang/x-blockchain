@@ -118,6 +118,7 @@
 				<option disabled selected value>-- select an option --</option>
 			</select>
 		</div>
+		<div>network ID: <span id="ntw-id"></span> | chain ID: <span id="ntw-chain-id"></span></div>
 		<div>provider: <span id="ntw-provider"></span></div>
 		<div>contractAddresses: <span id="ntw-contract-addresses"></span></div>
 		<div id="ntw-scan">etherScan:
@@ -132,6 +133,10 @@
 			<button onclick="scan('~', $('#ntw-scan .url-path').val(), $('#ntw-scan input').val())">GO</button>
 		</div>
 		<div id="node-info" class="output-console"></div>
+		<div id="ntw-info">
+			Network Info: <button onclick="getNetworkInfo('~')">GET</button>
+			<div class="output-console"></div>
+		</div>
 		<hr />
 
 		<div>Query:</div>
@@ -162,15 +167,12 @@
 		<br />
 
 		<div class="web3-item" id="account-balance-check">
-			Balance of:
-			<select class="select-account" onchange="onChangeAccForBalanceCheck(event.target.value)">
+			Account Balance: <select class="select-account" onchange="onChangeAccForBalanceCheck(event.target.value)">
 				<option selected value="">-- select an option --</option>
 			</select>
 			<input />
 			<button
-				onclick="getAccountBalance('~', document.querySelector('#account-balance-check input').value || $('#account-balance-check select').val(), '#account-balance-check .output-console')">
-				GET
-			</button>
+				onclick="getAccountBalance('~', $('#account-balance-check input').val() || $('#account-balance-check select').val(), '#account-balance-check .output-console')">GET</button>
 			:
 			<div class="output-console"></div>
 		</div>
@@ -395,11 +397,11 @@
 		<div id="contract-info-base" class="output-console"></div>
 		<br />
 
-		<div class="web3-item">
+		<div class="web3-item" id="contract-info">
 			Contract Info
 			<button onclick="getContractInfo('~')">GET</button>
 			:
-			<div id="contract-info" class="output-console"></div>
+			<div class="output-console"></div>
 		</div>
 		<br />
 
@@ -439,15 +441,15 @@
 		</div>
 		<br />
 
-		<div class="web3-item">
-			Account Token Balance: <select id="select-account-token-balance-check" class="select-account" onchange="onChangeAccForTokenBalanceCheck(event.target.value)">
+		<div class="web3-item" id="account-token-balance-check">
+			Account Token Balance: <select class="select-account" onchange="onChangeAccForTokenBalanceCheck(event.target.value)">
 				<option selected value="">-- select an option --</option>
 			</select>
-			<input id="input-account-token-balance-check" />
+			<input />
 			<button
-				onclick="getAccountTokenBalance('~', $('#input-account-token-balance-check').val() || $('#select-account-token-balance-check').val(), '#acc-token-balance-info')">GET</button>
+				onclick="getAccountTokenBalance('~', $('#account-token-balance-check input').val() || $('#account-token-balance-check select').val(), '#account-token-balance-check .output-console')">GET</button>
 			:
-			<div id="acc-token-balance-info" class="output-console"></div>
+			<div class="output-console"></div>
 		</div>
 		<br />
 
@@ -587,6 +589,8 @@
 
 			var networks = {
 				mainnet: {
+					networkID: 1,
+					chainID: 1,
 					provider: "https://mainnet.infura.io/v3/0be77c2f0459475d822b185ded148520",
 					scanSites: ["https://etherscan.io"],
 					contractAddresses: {
@@ -597,6 +601,8 @@
 					},
 				},
 				"test-ganache": {
+					networkID: 5777,
+					chainID: 1337,
 					provider: "ws://127.0.0.1:7545",
 					contractAddresses: {
 						XToken: ["0x0000000000000000000000000000000000000000"],
@@ -606,6 +612,8 @@
 					},
 				},
 				ropsten: {
+					networkID: 3,
+					chainID: 3,
 					provider: "https://ropsten.infura.io/v3/0be77c2f0459475d822b185ded148520",
 					scanSites: ["https://ropsten.etherscan.io"],
 					contractAddresses: {
@@ -616,6 +624,8 @@
 					},
 				},
 				kovan: {
+					networkID: 42,
+					chainID: 42,
 					provider: "https://kovan.infura.io/v3/0be77c2f0459475d822b185ded148520",
 					scanSites: ["https://kovan.etherscan.io"],
 					contractAddresses: {
@@ -626,6 +636,8 @@
 					},
 				},
 				rinkeby: {
+					networkID: 4,
+					chainID: 4,
 					provider: "https://rinkeby.infura.io/v3/0be77c2f0459475d822b185ded148520",
 					scanSites: ["https://rinkeby.etherscan.io"],
 					contractAddresses: {
@@ -636,6 +648,8 @@
 					},
 				},
 				GÖRLI: {
+					networkID: 5,
+					chainID: 5,
 					provider: "https://goerli.infura.io/v3/0be77c2f0459475d822b185ded148520",
 					scanSites: ["https://goerli.etherscan.io"],
 					contractAddresses: {
@@ -646,6 +660,8 @@
 					},
 				},
 				sepolia: {
+					networkID: 11155111,
+					chainID: 11155111,
 					provider: "https://sepolia.infura.io/v3/0be77c2f0459475d822b185ded148520",
 					scanSites: ["https://sepolia.etherscan.io"],
 					contractAddresses: {
@@ -772,6 +788,9 @@
 					outputConsole.innerHTML = null;
 
 					const network = networks[value];
+
+					document.getElementById("ntw-id").innerHTML = network.networkID;
+					document.getElementById("ntw-chain-id").innerHTML = network.chainID;
 					document.getElementById("ntw-provider").innerHTML = network.provider;
 					document.getElementById("ntw-contract-addresses").innerHTML = (network.contractAddresses && JSON.stringify(network.contractAddresses)) || null;
 
@@ -796,7 +815,33 @@
 					onAccountsUpdate([]);
 					onContractChange("onNetworkChange", selectContract.value);
 
-					outputConsole.innerHTML += "\n--  web3.providers: " + web3.providers
+					document.querySelector('#ntw-info .output-console').innerHTML = null
+					// await getNetworkInfo('onNetworkChange')
+					document.querySelector('#get-accounts .output-console').innerHTML = null
+					document.querySelector('#get-accounts-p .output-console').innerHTML = null
+					document.querySelector('#request-accounts .output-console').innerHTML = null
+					document.querySelector('#get-storage .output-console').innerHTML = null
+				} catch (e) {
+					console.error("!-  onNetworkChange - error:", e);
+					outputConsole.innerHTML += "\n!-  onNetworkChange - error: " + objToString(e);
+					Snackbar.e("onNetworkChange: " + objToString(e));
+				} finally {
+					outputConsole.innerHTML += "\n\n-------\nDONE";
+				}
+			}
+
+			async function getNetworkInfo(tag) {
+				const outputConsole = document.querySelector('#ntw-info .output-console');
+
+				try {
+					const network = selectNetwork.value && networks[selectNetwork.value];
+
+					if (!web3) {
+						Snackbar.w("Please select network");
+						return
+					}
+
+					outputConsole.innerHTML = "--  web3.providers: " + web3.providers
 						+ "\n--  web3.currentProvider: " + web3.currentProvider
 
 					outputConsole.innerHTML += "\n"
@@ -840,11 +885,24 @@
 						console.error("!-  web3.eth.getUncle:", e);
 						outputConsole.innerHTML += "\n!-  web3.eth.getUncle - error: " + objToString(e)
 					}
-					outputConsole.innerHTML += "\n--  web3.eth.getChainId: " + await web3.eth.getChainId()
+					const chainID = await web3.eth.getChainId()
+					if (network.chainID && chainID != network.chainID)
+						outputConsole.innerHTML += "\n!-  web3.eth.getChainId: " + chainID + " --> this is different from known ID"
+					else if (!network.chainID)
+						outputConsole.innerHTML += "\n--  web3.eth.getChainId: " + chainID + " --> " + Object.entries(networks).filter(x => x[1].chainID == chainID).map(x => x[0]).join(' | ')
+					else
+						outputConsole.innerHTML += "\n--  web3.eth.getChainId: " + chainID
 					outputConsole.innerHTML += "\n--  web3.eth.getNodeInfo: " + await web3.eth.getNodeInfo()
 
 					outputConsole.innerHTML += "\n"
-					outputConsole.innerHTML += "\n--  web3.eth.net.getId: " + await web3.eth.net.getId()
+					const netID = await web3.eth.net.getId()
+					outputConsole.innerHTML += "\n--  web3.eth.net.getId: " + netID
+					if (network.networkID && netID != network.networkID)
+						outputConsole.innerHTML += "\n!-  web3.eth.net.getId: " + netID + " --> this is different from known ID"
+					else if (!network.networkID)
+						outputConsole.innerHTML += "\n--  web3.eth.net.getId: " + netID + " --> " + Object.entries(networks).filter(x => x[1].networkID == netID).map(x => x[0]).join(' | ')
+					else
+						outputConsole.innerHTML += "\n--  web3.eth.net.getId: " + netID
 					outputConsole.innerHTML += "\n--  web3.eth.net.isListening: " + await web3.eth.net.isListening()
 					outputConsole.innerHTML += "\n--  web3.eth.net.getPeerCount: " + await web3.eth.net.getPeerCount()
 					outputConsole.innerHTML += "\n"
@@ -871,9 +929,9 @@
 					outputConsole.innerHTML += "\n"
 					outputConsole.innerHTML += "\n--  web3.eth.Contract.defaultAccount: " + web3.eth.Contract.defaultAccount
 				} catch (e) {
-					console.error("!-  onNetworkChange - error:", e);
-					outputConsole.innerHTML += "\n!-  onNetworkChange - error: " + objToString(e);
-					Snackbar.e("onNetworkChange: " + objToString(e));
+					console.error("!-  getNetworkInfo - error:", e);
+					outputConsole.innerHTML += "\n!-  getNetworkInfo - error: " + objToString(e);
+					Snackbar.e("getNetworkInfo: " + objToString(e));
 				} finally {
 					outputConsole.innerHTML += "\n\n-------\nDONE";
 				}
@@ -904,6 +962,7 @@
 				}
 
 				document.querySelector("#account-balance-check .output-console").innerHTML = null;
+				document.querySelector("#account-token-balance-check .output-console").innerHTML = null;
 			}
 
 			async function getAccounts(tag) {
@@ -1521,30 +1580,40 @@
 			function onContractChange(tag, value) {
 				console.log(`--  onContractChange [${tag}]:`, value);
 
-				const contract = contracts[value];
-				document.getElementById("contract-abi").innerHTML = (contract && contract.abi) || null;
+				const outputConsole = document.querySelector("#contract-info-base");
 
-				/** @type {HTMLSelectElement} selectContractAddress */
-				const selectContractAddress = document.getElementById("select-contract-address")
+				try {
+					const contract = contracts[value];
+					document.getElementById("contract-abi").innerHTML = (contract && contract.abi) || null;
 
-				for (let i = selectContractAddress.length - 1; i > 0; i--)
-					selectContractAddress.remove(i)
+					/** @type {HTMLSelectElement} selectContractAddress */
+					const selectContractAddress = document.getElementById("select-contract-address")
 
-				const contractAddresses = networks[selectNetwork.value] && networks[selectNetwork.value].contractAddresses && networks[selectNetwork.value].contractAddresses[value]
-				if (contractAddresses) {
-					for (let i of contractAddresses) {
-						const option = document.createElement("option");
-						option.text = i;
-						option.value = i;
-						selectContractAddress.add(option);
+					for (let i = selectContractAddress.length - 1; i > 0; i--)
+						selectContractAddress.remove(i)
+
+					const contractAddresses = networks[selectNetwork.value] && networks[selectNetwork.value].contractAddresses && networks[selectNetwork.value].contractAddresses[value]
+					if (contractAddresses && contractAddresses.length) {
+						for (let i of contractAddresses) {
+							const option = document.createElement("option");
+							option.text = i;
+							option.value = i;
+							selectContractAddress.add(option);
+						}
+
+						selectContractAddress.selectedIndex = 1
 					}
 
-					selectContractAddress.selectedIndex = 1
+					document.querySelector("#contract-info .output-console").innerHTML = null;
+				} catch (e) {
+					console.error("!-  onContractChange - error:", e);
+					outputConsole.innerHTML += "\n!-  onContractChange - error: " + objToString(e);
+					Snackbar.e("onContractChange: " + objToString(e));
 				}
 			}
 
 			async function getContractInfo(tag) {
-				const outputConsole = document.getElementById("contract-info");
+				const outputConsole = document.querySelector("#contract-info .output-console");
 
 				try {
 					outputConsole.innerHTML = '...';
@@ -1682,8 +1751,8 @@
 			}
 
 			function onChangeAccForTokenBalanceCheck(account) {
-				if (account) document.getElementById("input-account-token-balance-check").value = null;
-				getAccountTokenBalance("onChangeAccForTokenBalanceCheck", account, "#acc-token-balance-info");
+				if (account) document.querySelector("#account-token-balance-check input").value = null;
+				getAccountTokenBalance("onChangeAccForTokenBalanceCheck", account, "#account-token-balance-check .output-console");
 			}
 
 			async function getAccountTokenBalance(tag, accAddress, outputID) {
@@ -1706,7 +1775,7 @@
 
 						await contract.methods.balanceOf(accAddress).call((err, result) => {
 							console.log(`<-- balanceOf {${accAddress}}:`, err, "|", result);
-							if (err) outputConsole.innerHTML = "error: " + objToString(err);
+							if (err) outputConsole.innerHTML = "!-  error: " + objToString(err);
 							if (result && !err) outputConsole.innerHTML = result;
 							else if (result && err) outputConsole.innerHTML += '\n> ' + result;
 						});
