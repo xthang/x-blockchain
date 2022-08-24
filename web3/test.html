@@ -16,10 +16,11 @@
 
 	<!-- <base target="_blank"> -->
 
+	<!-- <link type="text/css" rel="stylesheet" id="fontello-css" href="/css/fontello-70156438/css/fontello.css" media="all"> -->
+
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<!-- <script src="https://kit.fontawesome.com/8d7fa40fed.js" crossorigin="anonymous"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-	<!-- <link type="text/css" rel="stylesheet" id="fontello-css" href="/css/fontello-70156438/css/fontello.css" media="all"> -->
 
 	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/global.css" media="all" />
 	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/x-common.css" media="all" />
@@ -33,6 +34,18 @@
 	<script src="https://xthang.xyz/js/global.js"></script>
 
 	<style id="font">
+		#main-wrapper,
+		.main-wrapper {
+			/* uncomment these following lines to archive footer behaviour like in home page */
+			min-height: 100%;
+		}
+
+		#footer {
+			/* uncomment these following lines to archive footer behaviour like in home page */
+			position: absolute;
+			bottom: 0px;
+		}
+
 		.web3-item {
 			overflow: auto;
 			padding: 7px;
@@ -76,26 +89,28 @@
 </head>
 
 <body>
-	<div>
-		<div id="snackbar">Some text some message..</div>
-		<script src="https://xthang.xyz/add-ons/snackbar.js"></script>
+	<div id="snackbar">Some text some message..</div>
+	<script src="https://xthang.xyz/add-ons/snackbar.js"></script>
 
-		<div id="warning-view">
-			<span class="warning-text">Please upgrade your browser to newer version</span>
+	<div id="warning-view">
+		<span class="warning-text">Please upgrade your browser to newer version</span>
+	</div>
+	<script>
+		let _ = (document.getElementById("warning-view").hidden = true); // let is not available on ECMAScript < 6th edition
+	</script>
+
+	<div id="SpinnerBar" class="spinner-bar-page">
+		<div class="spinner-bar">
+			<div class="bounce1"></div>
+			<div class="bounce2"></div>
+			<div class="bounce3"></div>
 		</div>
-		<script>
-			let _ = (document.getElementById("warning-view").hidden = true); // let is not available on ECMAScript < 6th edition
-		</script>
+	</div>
 
-		<div id="SpinnerBar" class="spinner-bar-page">
-			<div class="spinner-bar">
-				<div class="bounce1"></div>
-				<div class="bounce2"></div>
-				<div class="bounce3"></div>
-			</div>
-		</div>
-
+	<div id="main-view">
 		<div class="main-wrapper">
+			<!-- add new content here -->
+
 			<div>Web3.version: <span id="Web3.version"></span></div>
 			<div>Web3.modules: <span id="Web3.modules"></span></div>
 			<div>window.ethereum: <span id="window.ethereum"></span></div>
@@ -1991,13 +2006,16 @@
 					}
 				}
 			</script>
-		</div>
 
-		<footer id="footer">
-			<hr />
-			&copy; by <abbr title="Nguyễn Xuân Thắng">XT</abbr> 2018
-			<span id="app-info" style="float: right"></span>
-		</footer>
+			<footer>
+				<div id="antioverlap"></div>
+				<div id="footer">
+					<hr>
+					<span>&copy; by <abbr title="Nguyễn Xuân Thắng">XT</abbr> 2022</span>
+					<div class="full-scr"><button>[ ]</button></div>
+				</div>
+			</footer>
+		</div>
 	</div>
 
 	<!-- <script src="https://xthang.xyz/js/snow.js"></script> -->
