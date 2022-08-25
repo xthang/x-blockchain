@@ -22,19 +22,18 @@
 	<!-- <script src="https://kit.fontawesome.com/8d7fa40fed.js" crossorigin="anonymous"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 
-	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/global.css" media="all" />
-	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/x-common.css" media="all" />
-	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/loader.css" media="all" />
-	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/loader-fpt.css" media="all" />
-	<!-- <link type="text/css" rel="stylesheet" href="https://xthang.xyz/css/pulsing-rings.css" media="all"> -->
-	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/add-ons/snackbar.css" media="all" />
+	<link type="text/css" rel="stylesheet" href="https://css.xthang.xyz/global.css" media="all" />
+	<link type="text/css" rel="stylesheet" href="https://css.xthang.xyz/x-common.css" media="all" />
+	<link type="text/css" rel="stylesheet" href="https://css.xthang.xyz/loader.css" media="all" />
+	<link type="text/css" rel="stylesheet" href="https://css.xthang.xyz/loader-fpt.css" media="all" />
+	<!-- <link type="text/css" rel="stylesheet" href="https://css.xthang.xyz/pulsing-rings.css" media="all"> -->
+	<link type="text/css" rel="stylesheet" href="https://add-ons.xthang.xyz/snackbar.css" media="all" />
 	<!-- <link type="text/css" rel="stylesheet" href="/add-ons/dragMenu.css" media="all"> -->
-	<link type="text/css" rel="stylesheet" href="https://xthang.xyz/add-ons/toggle-switch.css" media="all" />
+	<link type="text/css" rel="stylesheet" href="https://add-ons.xthang.xyz/toggle-switch.css" media="all" />
 
-	<script src="https://xthang.xyz/js/global.js"></script>
+	<script src="https://js.xthang.xyz/global.js"></script>
 
 	<style id="font">
-		#main-wrapper,
 		.main-wrapper {
 			/* uncomment these following lines to archive footer behaviour like in home page */
 			min-height: 100%;
@@ -46,8 +45,12 @@
 			bottom: 0px;
 		}
 
-		.web3-item {
+		.web3-item,
+		.select-item {
 			overflow: auto;
+		}
+
+		.web3-item {
 			padding: 7px;
 			border: 1px solid silver;
 			border-radius: 5px;
@@ -90,13 +93,13 @@
 
 <body>
 	<div id="snackbar">Some text some message..</div>
-	<script src="https://xthang.xyz/add-ons/snackbar.js"></script>
+	<script src="https://add-ons.xthang.xyz/snackbar.js"></script>
 
 	<div id="warning-view">
 		<span class="warning-text">Please upgrade your browser to newer version</span>
 	</div>
 	<script>
-		let _ = (document.getElementById("warning-view").hidden = true); // let is not available on ECMAScript < 6th edition
+		if (getECMAScriptVersion().edition >= 6) document.getElementById("warning-view").hidden = true; // let is not available on ECMAScript < 6th edition
 	</script>
 
 	<div id="SpinnerBar" class="spinner-bar-page">
@@ -125,27 +128,28 @@
 			</div>
 			<hr />
 
-			<div>
+			<div class="select-item">
 				<label for="select-network">Network:</label>
 				<select id="select-network" onchange="onNetworkChange(event.target.value)">
 					<option disabled selected value>-- select an option --</option>
 				</select>
+
+				<div>network ID: <span id="ntw-id"></span> | chain ID: <span id="ntw-chain-id"></span></div>
+				<div>provider: <span id="ntw-provider"></span></div>
+				<div>contractAddresses: <span id="ntw-contract-addresses"></span></div>
+				<div id="ntw-scan">etherScan:
+					Address: <select class="site"></select>
+					Type: <select class="url-path">
+						<option disabled selected value="">-- select an option --</option>
+						<option>address</option>
+						<option>tx</option>
+						<option>token</option>
+					</select>
+					<input>
+					<button onclick="scan('~', $('#ntw-scan .url-path').val(), $('#ntw-scan input').val())">GO</button>
+				</div>
+				<div id="node-info" class="output-console"></div>
 			</div>
-			<div>network ID: <span id="ntw-id"></span> | chain ID: <span id="ntw-chain-id"></span></div>
-			<div>provider: <span id="ntw-provider"></span></div>
-			<div style="overflow: auto;">contractAddresses: <span id="ntw-contract-addresses"></span></div>
-			<div id="ntw-scan">etherScan:
-				Address: <select class="site"></select>
-				Type: <select class="url-path">
-					<option disabled selected value="">-- select an option --</option>
-					<option>address</option>
-					<option>tx</option>
-					<option>token</option>
-				</select>
-				<input>
-				<button onclick="scan('~', $('#ntw-scan .url-path').val(), $('#ntw-scan input').val())">GO</button>
-			</div>
-			<div id="node-info" class="output-console"></div>
 			<hr />
 
 			<div class="web3-item reset-on-network-change" id="ntw-info">
@@ -428,21 +432,22 @@
 			</div>
 			<br />
 
-			<div>
+			<div class="select-item">
 				<label for="select-contract">Contract:</label>
 				<select id="select-contract" class="select-contract" onchange="onContractChange('~', event.target.value)">
 					<option disabled selected value>-- select an option --</option>
 				</select>
+
+				<div>contract abi <button onclick="$('#contract-abi').toggle(700)">SHOW/HIDE</button>: <span id="contract-abi" style="display: none;"></span></div>
+				<div>
+					<label for="select-contract-address">contract address: </label>
+					<select id="select-contract-address">
+						<option selected value>-- select an option --</option>
+					</select>
+					<input id="contract-address" />
+				</div>
+				<div id="contract-info-base" class="output-console"></div>
 			</div>
-			<div>contract abi <button onclick="$('#contract-abi').toggle(700)">SHOW/HIDE</button>: <span id="contract-abi" style="display: none;"></span></div>
-			<div>
-				<label for="select-contract-address">contract address: </label>
-				<select id="select-contract-address">
-					<option selected value>-- select an option --</option>
-				</select>
-				<input id="contract-address" />
-			</div>
-			<div id="contract-info-base" class="output-console"></div>
 			<br />
 
 			<div class="web3-item reset-on-contract-change" id="contract-info">
@@ -2018,7 +2023,7 @@
 		</div>
 	</div>
 
-	<!-- <script src="https://xthang.xyz/js/snow.js"></script> -->
+	<!-- <script src="https://js.xthang.xyz/snow.js"></script> -->
 
 	<script>
 		window.addEventListener("load", function (event) {
